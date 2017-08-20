@@ -1,0 +1,1 @@
+var Database=function(t){this.data=t};Database.prototype={set:function(t){var a=JSON.stringify(t.storageItem);window.localStorage.setItem(t.storageUnit,a)},get:function(t){return JSON.parse(window.localStorage.getItem(t.storageUnit))}};

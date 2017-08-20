@@ -1,4 +1,3 @@
-
 // Let's prepare the Model
 var mintModel = function() {
   'use strict';
@@ -40,6 +39,7 @@ var mintModel = function() {
 
   // Set up the database
   this.database = new Database();
+  this.DateFactory = new DateFactory();
 };
 
 mintModel.prototype = {
@@ -57,15 +57,7 @@ mintModel.prototype = {
   getDateInt: function() {
     // Get today's date and return it in an integer, starting with the year
     // EG: 20170726
-    var time = new Date($.now());
-    var year = time.getFullYear();
-    var month = time.getMonth() + 1;
-    // Check if the month is less than 10, add 0 before month number
-    if (month < 10) {
-      month = "0" + month;
-    }
-    var date = time.getDate();
-    return parseInt(year + month + date);
+    return this.DateFactory.getInt();
   },
   sanitizeText: function(text) {
     // Make it so sneaky buggers can't add sneaky code in any of the inputs. Always run input entries through this function.
@@ -130,9 +122,11 @@ mintModel.prototype = {
   deleteAccomplishmint: function(id) {
     // This function handles the deletion of
     var accomplishmints = this.accomplishmints.sort();
+    id = parseInt(id);
     // Search the array for the matching ID. When it is found, remove it from the array
     for (var i = accomplishmints.length - 1; i >= 0; i--) {
-      if (accomplishmints[i].id === id) {accomplishmints.splice(i, 1);
+      if (accomplishmints[i].id === id) {
+        accomplishmints.splice(i, 1);
       }
     }
     this.putAccomplishmintsIntoStorage();
@@ -295,6 +289,7 @@ mintModel.prototype = {
   updateDatesInArchive: function() {
     // Load in variables
     var accomplishmints = this.accomplishmints;
+
     // Reset the dates in archive to zero.
     this.datesInArchive = [];
     // Go through all the accomplishmints and pull the date variables and throw them into an array.

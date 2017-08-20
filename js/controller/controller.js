@@ -81,6 +81,7 @@ mintController.prototype = {
   deleteAccomplishmint: function(sender, args) {
     // Self explanatory
     var id = args.id;
+    window.console.log("delete this: " + id);
     this.model.deleteAccomplishmint(id);
   },
   updateStarLevel: function(sender, args) {
