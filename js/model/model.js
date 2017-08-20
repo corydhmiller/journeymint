@@ -1,5 +1,7 @@
+
 // Let's prepare the Model
 var mintModel = function() {
+  'use strict';
   // Set up variables
   this.accomplishmints = [];
   // These are dummy tags. Every global tag will be stored here in these tags. In the future, this list will be stored and retrieve just like the accomplishmints
@@ -37,7 +39,7 @@ var mintModel = function() {
   this.displayTagErrorEvent = new Event(this);
 
   // Set up the database
-  this.database = new Database(this);
+  this.database = new Database();
 };
 
 mintModel.prototype = {
