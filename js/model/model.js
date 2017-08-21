@@ -1,6 +1,5 @@
 // Let's prepare the Model
 var mintModel = function() {
-  'use strict';
   // Set up variables
   this.accomplishmints = [];
   // These are dummy tags. Every global tag will be stored here in these tags. In the future, this list will be stored and retrieve just like the accomplishmints
@@ -34,7 +33,7 @@ var mintModel = function() {
   this.updateItemTagsEvent = new Event(this);
   this.addItemTagEvent = new Event(this);
   this.deleteItemTagEvent = new Event(this);
-  this.updateTodaysScoreEvent = new Event(this);
+  //this.updateTodaysScoreEvent = new Event(this);
   this.displayTagErrorEvent = new Event(this);
 
   // Set up the database
@@ -61,10 +60,7 @@ mintModel.prototype = {
   },
   sanitizeText: function(text) {
     // Make it so sneaky buggers can't add sneaky code in any of the inputs. Always run input entries through this function.
-    return text
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/"/g, "&quot;");
+    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
   },
   addAccomplishmint: function(content) {
     // This is the main function that adds new accomplishmints into the Model's data
@@ -96,32 +92,30 @@ mintModel.prototype = {
     // Run the function that submits the Model's data into the database/storage
     this.putAccomplishmintsIntoStorage();
     this.addAccomplishmintEvent.notify(newAccomplishmint);
-    this.updateTodaysScoreEvent.notify();
+    //this.updateTodaysScoreEvent.notify();
   },
   saveEditedAccomplishmint: function(id, newcontent) {
-    // This gets the new content from the edited item and puts it into the correct place in the database,
-    //overwriting what already existed. Currently it is VERY limited.
-    //Need to switch the function args to an object instead of individual variables.
-    newcontent = this.sanitizeText(newcontent);
+    id = parseInt(id);
     var accomplishmints = this.accomplishmints;
     // Find the matching accomplishmint ID and insert new content
-    for (var i = accomplishmints.length - 1; i >= 0; i--) {
-      if (accomplishmints[i].id === id) {
-        accomplishmints[i].content = newcontent;
-        accomplishmints[i].score = this.getAccomplishmintScore(newcontent);
+    for (var item in accomplishmints) {
+      if (accomplishmints[item].id === id) {
+        accomplishmints[item].content = newcontent;
+        accomplishmints[item].score = this.getAccomplishmintScore(newcontent);
       }
     }
     // Run the function that submits the Model's data into the database/storage
     this.putAccomplishmintsIntoStorage();
     this.saveEditedAccomplishmintEvent.notify({
-      id: id
+      id: id,
+      newcontent: newcontent
     });
-    this.updateTodaysScoreEvent.notify();
+    //this.updateTodaysScoreEvent.notify();
   },
-
   deleteAccomplishmint: function(id) {
     // This function handles the deletion of
     var accomplishmints = this.accomplishmints.sort();
+    // Convert ID from string into integer
     id = parseInt(id);
     // Search the array for the matching ID. When it is found, remove it from the array
     for (var i = accomplishmints.length - 1; i >= 0; i--) {
@@ -130,7 +124,7 @@ mintModel.prototype = {
       }
     }
     this.putAccomplishmintsIntoStorage();
-    this.updateTodaysScoreEvent.notify();
+    //this.updateTodaysScoreEvent.notify();
     this.deleteAccomplishmintEvent.notify({
       id: id
     });
@@ -138,13 +132,6 @@ mintModel.prototype = {
   checkThroughArrayForNumber: function(value, array) {
     // This function takes a value and looks through an array to see if the array contains that value
     return array.indexOf(value) > -1;
-  },
-  addClassForATime:function(event, toggle, time) {
-    event.removeClass(toggle);
-    setTimeout(function(){
-      event.addClass(toggle);
-    }, time);
-    event.removeClass(toggle);
   },
   addNewTagToItem: function(id, tagname) {
     // Parse into integer so it can match up with the object.
@@ -266,9 +253,6 @@ mintModel.prototype = {
       storageItem: this.accomplishmints,
       storageUnit: "accomplishmintsAppStorage"
     });
-    
-    //var accomplishmintsJSON = JSON.stringify(this.accomplishmints);
-    //window.localStorage.setItem('accomplishmintsAppStorage', accomplishmintsJSON);
     this.putAccomplishmintsIntoStorageEvent.notify();
     return;
   },
@@ -289,7 +273,6 @@ mintModel.prototype = {
   updateDatesInArchive: function() {
     // Load in variables
     var accomplishmints = this.accomplishmints;
-
     // Reset the dates in archive to zero.
     this.datesInArchive = [];
     // Go through all the accomplishmints and pull the date variables and throw them into an array.
@@ -307,7 +290,9 @@ mintModel.prototype = {
     var storedTags = this.database.get({
       storageUnit: "accomplishmintsAppStorage--tags"
     });
+
     if (storedTags === null || storedTags === "") {
+
     } else {
       // Update the model's data to reflect what is in storage.
       this.tags = storedTags;

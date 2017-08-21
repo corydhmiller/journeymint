@@ -12,5 +12,4 @@ DateFactory.prototype = {
 	getInt: function() {
 		return parseInt(this.year + this.month + this.date);
 	}
-
 };
