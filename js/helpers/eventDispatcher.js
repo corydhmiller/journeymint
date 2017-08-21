@@ -4,7 +4,12 @@ var Event = function(sender) {
 };
 Event.prototype = {
   attach: function(listener) {
-    this.listeners.push(listener);
+      this.listeners.push(listener);
+  },
+  subscribe: function(listener) {
+    for (var i in listener) {
+      this.listeners.push(listener[i]); 
+    }
   },
   notify: function(args) {
     for (var i = 0; i < this.listeners.length; i += 1) {

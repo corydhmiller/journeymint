@@ -3,17 +3,18 @@ var mintView = function(model) {
   this.addAccomplishmintEvent = new Event(this);
   this.deleteAccomplishmintEvent = new Event(this);
   this.saveEditedAccomplishmintEvent = new Event(this);
-  this.keyActionEvent = new Event(this);
-  this.startBuildingListEvent = new Event(this);
   this.deleteItemTagClickEvent = new Event(this);
   this.updateStarLevelEvent = new Event(this);
+  this.keyWasPressedEvent = new Event(this);
 
   this.init();
 };
 
 mintView.prototype = {
   init: function() {
-    this.createChildren().setupHandlers().enable();
+    this.createChildren()
+    .setupHandlers()
+    .enable();
   },
 
   createChildren: function() {
@@ -21,18 +22,18 @@ mintView.prototype = {
     this.$appHeader = $(".app-header");
     this.$appBody = $(".app-body");
     this.$input = $(".accomplishmint__input");
-    this.$editableInput = $(".editable-accomplishmint");
-    this.$accomplishmintList = $(".accomplishmints-list");
-    this.$accomplishmint = $(".accomplishmint__item");
+    this.$accomplishmintsList = $(".accomplishmints-list");
     this.$accomplishmintContainer = $(".accomplishmint-container");
     this.$messageContainer = $(".message-container");
-    this.$message = $(".message");
     this.$scoreTally = $(".app-score__tally");
+    this.$advancedContainer = $(".item__advanced");
+    this.$itemContainer = this.$accomplishmintsList.find(".item-container");
+    this.$itemTagInput = this.$accomplishmintsList.find(".item__tag__input");
+    window.console.log(this);
 
     return this;
   },
   setupHandlers: function() {
-    this.keyActionsHandler = this.keyActions.bind(this);
     this.addAccomplishmintHandler = this.addAccomplishmint.bind(this);
     this.deleteAccomplishmintHandler = this.deleteAccomplishmint.bind(this);
     this.removeAccomplishmintFromViewHandler = this.removeAccomplishmintFromView.bind(this);
@@ -48,48 +49,54 @@ mintView.prototype = {
     this.deleteItemTagHandler = this.deleteItemTag.bind(this);
     this.deleteItemTagClickHandler = this.deleteItemTagClick.bind(this);
     this.displayTagErrorHandler = this.displayTagError.bind(this);
+    this.keyActionsHandler = this.keyActions.bind(this);
+    this.cacheDOMHandler = this.cacheDOM.bind(this);
     return this;
   },
 
   enable: function() {
-    this.model.addAccomplishmintEvent.attach(this.addAccomplishmintHandler);
-    this.model.addAccomplishmintEvent.attach(this.displayNewEncouragementHandler);
+    // Listeners
     this.model.retrieveAccomplishmintsFromStorageEvent.attach(this.buildListHandler);
-    this.model.deleteAccomplishmintEvent.attach(this.removeAccomplishmintFromViewHandler);
-    this.model.saveEditedAccomplishmintEvent.attach(this.rebuildItemCardHandler);
-    this.model.updateTodaysScoreEvent.attach(this.updateTodaysScoreHandler);
+    this.model.addAccomplishmintEvent.subscribe([
+      this.displayNewEncouragementHandler,
+      this.addAccomplishmintHandler,
+      this.updateTodaysScoreHandler,
+      this.cacheDOMHandler
+    ]);
+    this.model.deleteAccomplishmintEvent.subscribe([
+      this.removeAccomplishmintFromViewHandler,
+      this.updateTodaysScoreHandler,
+      this.cacheDOMHandler
+    ]);
+    this.model.saveEditedAccomplishmintEvent.subscribe([
+      this.rebuildItemCardHandler,
+      this.updateTodaysScoreHandler,
+      this.cacheDOMHandler
+    ]);
+    //this.model.updateTodaysScoreEvent.attach(this.updateTodaysScoreHandler);
     this.model.addItemTagEvent.attach(this.addItemTagHandler);
     this.model.deleteItemTagEvent.attach(this.deleteItemTagHandler);
     this.model.displayTagErrorEvent.attach(this.displayTagErrorHandler);
 
     // Manage actions
     this.$input.keydown(this.keyActionsHandler);
-    this.$accomplishmintList.on("keydown", ".editable-accomplishmint", this.keyActionsHandler);
-    this.$accomplishmintList.on("keydown", ".item__tag__input", this.keyActionsHandler);
-    this.$accomplishmintList.on("click", ".accomplishmint-delete", this.deleteAccomplishmintHandler);
-    this.$accomplishmintList.on( "click", ".accomplishmint-edit", this.editAccomplishmintHandler);
-    this.$accomplishmintList.on("click", ".accomplishmint-save", this.saveEditedAccomplishmintHandler);
-    this.$accomplishmintList.on("click", ".accomplishmint__item-content--editable", this.editAccomplishmintHandler);
-    this.$accomplishmintList.on("click", ".item__tag .item__close", this.deleteItemTagClickHandler);
-    this.$accomplishmintList.on("click", ".item__stars label", this.updateStarLevelHandler);
+    this.$accomplishmintsList.on("keydown", ".editable-accomplishmint", this.keyActionsHandler);
+    // this.$itemTagInput.keydown(this.keyActionsHandler);
+    this.$accomplishmintsList.on("keydown", this.$itemTagInput, this.keyActionsHandler);
+    this.$accomplishmintsList.on("click", ".accomplishmint-delete", this.deleteAccomplishmintHandler);
+    this.$accomplishmintsList.on("click", ".accomplishmint-edit", this.editAccomplishmintHandler);
+    this.$accomplishmintsList.on("click", ".accomplishmint-save", this.saveEditedAccomplishmintHandler);
+    this.$accomplishmintsList.on("click", ".accomplishmint__item-content--editable", this.editAccomplishmintHandler);
+    this.$accomplishmintsList.on("click", ".item__tag .item__close", this.deleteItemTagClickHandler);
+    this.$accomplishmintsList.on("click", ".item__stars label", this.updateStarLevelHandler);
 
     return this;
   },
-  keyActions: function(event) {
-    // Currently, this action is fired upon every single keypress.
-    // Unsure if this is the best method.
-    this.keyActionEvent.notify({
-      key: event.keyCode,
-      input: event.currentTarget.className,
-      value: event.currentTarget.value,
-      id: this.getParentItemContainerID(event),
-      event: event
-    });
+  cacheDOM:function() {
+    this.createChildren();
   },
-  newKeyActions: function(event) {
-    this.keyWasPressed.notify ({
-      event:event
-    });
+  keyActions: function(event) {
+    this.keyWasPressedEvent.notify({event: event});
   },
   getParentItemContainerID:function(event){
     return $(event.target).parents(".item-container").attr("id");
@@ -104,7 +111,7 @@ mintView.prototype = {
     this.$scoreTally.text(modelScore);
   },
   addAccomplishmint: function(sender, args) {
-    this.$accomplishmintList.prepend(
+    this.$accomplishmintsList.prepend(
       this.generateItemHTML(args.id, args.content)
     );
     // Clear the primary input
@@ -126,8 +133,8 @@ mintView.prototype = {
     }, time);
   },
   displayTagError:function(sender, args) {
-    this.addClassForATime($("#advanced-" + args.id).find("#item__tag__input"), "input--error", 1000);
-    this.addClassForATime($("#advanced-" + args.id).find("#item__tag__input"), "shake", 1000);
+    this.addClassForATime($("#advanced-" + args.id).find(".item__tag__input"), "input--error", 1000);
+    this.addClassForATime($("#advanced-" + args.id).find(".item__tag__input"), "shake", 1000);
     this.addClassForATime($("#advanced-" + args.id).find("[data-tagid='" + args.tagid + "']"), "shake", 1000);
   },
   editAccomplishmint: function(event) {
@@ -203,10 +210,10 @@ mintView.prototype = {
     // Get the data from the model and set some variables
     var accomplishmints = this.model.getAccomplishmints();
     // Clear the HTML in the view
-    this.$accomplishmintList.html("");   
+    this.$accomplishmintsList.html("");   
     // Now let's add the items in each section
     for (var item in accomplishmints) {
-      this.$accomplishmintList.prepend(
+      this.$accomplishmintsList.prepend(
          this.generateItemHTML(
            accomplishmints[item].id, accomplishmints[item].content
          )
@@ -215,6 +222,7 @@ mintView.prototype = {
     }
     this.clearAccomplishmintInput();
     this.updateTodaysScore();
+    this.cacheDOM();
   },
   assignRandomColorClass:function() {
     var randomColors = ['item__tag--green', 'item__tag--lightgreen', 'item__tag--darkgreen'];
@@ -269,7 +277,7 @@ mintView.prototype = {
     return (
       '<div class="item__tags"><small>Add some tags related to your accomplishmint:</small><br><div class="item__tags-list">' +
       html +
-      '</div><input id="item__tag__input" class="item__tag__input" data-id="' +
+      '</div><input class="item__tag__input" data-id="' +
       id +
       '"/></div>'
     );
@@ -364,9 +372,7 @@ mintView.prototype = {
     this.buildList(todaysDate);
   },
   rebuildItemCard: function(sender, args) {
-    // This function replaces the current editable card with a fresh card using the edited value.
-    var newcontent = $('#edit-' + args.id).val();
-    $("#" + args.id).find(".accomplishmint-container").replaceWith(this.generateItemCardHTML(args.id, newcontent));
+    $("#" + args.id).find(".accomplishmint-container").replaceWith(this.generateItemCardHTML(args.id, args.newcontent));
   },
   clearAccomplishmintInput: function() {
     // If you don't know what this does, I can't help you.
