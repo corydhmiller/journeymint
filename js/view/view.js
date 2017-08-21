@@ -29,7 +29,6 @@ mintView.prototype = {
     this.$advancedContainer = $(".item__advanced");
     this.$itemContainer = this.$accomplishmintsList.find(".item-container");
     this.$itemTagInput = this.$accomplishmintsList.find(".item__tag__input");
-    window.console.log(this);
 
     return this;
   },
@@ -40,7 +39,6 @@ mintView.prototype = {
     this.editAccomplishmintHandler = this.editAccomplishmint.bind(this);
     this.saveEditedAccomplishmintHandler = this.saveEditedAccomplishmint.bind(this);
     this.buildListHandler = this.buildList.bind(this);
-    this.beforeBuildHandler = this.beforeBuild.bind(this);
     this.displayNewEncouragementHandler = this.displayNewEncouragement.bind(this);
     this.rebuildItemCardHandler = this.rebuildItemCard.bind(this);
     this.updateStarLevelHandler = this.updateStarLevel.bind(this);
@@ -81,7 +79,6 @@ mintView.prototype = {
     // Manage actions
     this.$input.keydown(this.keyActionsHandler);
     this.$accomplishmintsList.on("keydown", ".editable-accomplishmint", this.keyActionsHandler);
-    // this.$itemTagInput.keydown(this.keyActionsHandler);
     this.$accomplishmintsList.on("keydown", this.$itemTagInput, this.keyActionsHandler);
     this.$accomplishmintsList.on("click", ".accomplishmint-delete", this.deleteAccomplishmintHandler);
     this.$accomplishmintsList.on("click", ".accomplishmint-edit", this.editAccomplishmintHandler);
@@ -96,7 +93,9 @@ mintView.prototype = {
     this.createChildren();
   },
   keyActions: function(event) {
-    this.keyWasPressedEvent.notify({event: event});
+    this.keyWasPressedEvent.notify({
+      event: event
+    });
   },
   getParentItemContainerID:function(event){
     return $(event.target).parents(".item-container").attr("id");
@@ -175,9 +174,8 @@ mintView.prototype = {
       .text("Save");
   },
   saveEditedAccomplishmint: function(event) {
-    var id = this.getParentItemContainerID(event);
     this.saveEditedAccomplishmintEvent.notify({
-      id: id
+      event: event
     });
   },
   convertDateIntToString: function(int) {
@@ -359,17 +357,6 @@ mintView.prototype = {
         this.generateItemAdvancedMenuHTML(id) +
         "</div>";
     return newItemHTML;
-  },
-  beforeBuild: function(sender, args) {
-    // This function is called prior to the full list building.
-    // It checks if an id has been passed along, and if so,
-    // we go to rebuild that specific id.
-    if (args.id) {
-      this.rebuildItemCard(args.id);
-      return;
-    }
-    var todaysDate = this.model.getDateInt();
-    this.buildList(todaysDate);
   },
   rebuildItemCard: function(sender, args) {
     $("#" + args.id).find(".accomplishmint-container").replaceWith(this.generateItemCardHTML(args.id, args.newcontent));

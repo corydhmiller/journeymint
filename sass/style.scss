@@ -1,6 +1,6 @@
 // Typography
-@import url('https://fonts.googleapis.com/css?family=Heebo|Palanquin+Dark:500');
-$font: 'Heebo', sans-serif;
+@import url('https://fonts.googleapis.com/css?family=Fira+Sans|Palanquin+Dark:500');
+$font: 'Fira Sans', sans-serif;
 $header: 'Palanquin Dark';
 
 // Color Scheme
@@ -39,6 +39,7 @@ input,button {
 h4 {
   margin:0;
   padding:0;
+  font-weight:500;
 }
 input {
   border-radius:0;
@@ -61,7 +62,7 @@ h1 {
 }
 .app-score {
   color:$primary;
-  font-weight:bold;
+  font-weight:500;
   margin-top:20px;
 }
 .tagline {
@@ -72,7 +73,7 @@ h1 {
   background: $dark;
   display: inline-block;
   font-size: .7em;
-  font-weight: bold;
+  font-weight: 500;
 }
 .app-container {
   min-height:100vh;
@@ -106,7 +107,7 @@ h1 {
   display: inline-block;
   font-size: inherit;
   color: $primary;
-  font-weight:600;
+  font-weight:500;
   border-bottom: 3px solid $primary;
   min-width: 200px;
   width:100%;
@@ -199,7 +200,7 @@ h1 {
 .editable-accomplishmint {
   outline:0;
   color:$blue;
-  font-weight:600;
+  font-weight:500;
   border-bottom:2px solid $blue;
 }
 .item__advanced {
@@ -228,7 +229,7 @@ h1 {
   padding:2px 5px;
   margin:2px 5px;
   border-radius:.2em;
-  font-weight:600;
+  font-weight:500;
   color:$mintwhite;
 }
 .item__close {
