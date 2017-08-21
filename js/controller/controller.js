@@ -48,7 +48,7 @@ mintController.prototype = {
     if ($input === "editable-accomplishmint") {
       if (key === 13 || key === 10) {
         event.preventDefault();
-        this.saveEditedAccomplishmint(id, content);
+        this.saveEditedAccomplishmint(sender, args);
       }
       return;
     }
@@ -68,10 +68,12 @@ mintController.prototype = {
   deleteItemTag: function(sender, args) {
     this.model.deleteItemTag(args);
   },
-  
-  saveEditedAccomplishmint: function(id, newcontent) {
+  saveEditedAccomplishmint: function(sender, args) {
     // Grab the id, do some stuff that maybe the controller shouldn't be doing,
     // and save it in the model.
+    var event = args.event;
+    var id = $(event.target).closest('.item-container').attr('id');
+    var newcontent = $("#"+id).find('.editable-accomplishmint').val();
     $("#advanced-" + id).removeClass("item__advanced--open");
     this.model.saveEditedAccomplishmint(id, newcontent);
   },
