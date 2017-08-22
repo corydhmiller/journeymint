@@ -74,7 +74,8 @@ mintView.prototype = {
     // Manage actions
     this.$input.keydown(this.keyActionsHandler);
     this.$accomplishmintsList.on("keydown", ".editable-accomplishmint", this.keyActionsHandler);
-    this.$accomplishmintsList.on("keydown", this.$itemTagInput, this.keyActionsHandler);
+    this.$accomplishmintsList.on("keydown", ".item__tag__input", this.keyActionsHandler);
+    this.$accomplishmintsList.on("keyup", ".item__notes__input", this.keyActionsHandler);
     this.$accomplishmintsList.on("click", ".accomplishmint-delete", this.deleteAccomplishmintHandler);
     this.$accomplishmintsList.on("click", ".accomplishmint-edit", this.editAccomplishmintHandler);
     this.$accomplishmintsList.on("click", ".accomplishmint-save", this.saveEditedAccomplishmintHandler);
@@ -321,7 +322,14 @@ mintView.prototype = {
     });
   },
   generateItemNotesHTML: function(id) {
-    return '<div class="item__notes" data-id="' + id + '"><small>Add some notes about what you did:</small><br> <textarea class="item__notes__input" cols="40" rows="5"></textarea></div>';
+    var accomplishmints = this.model.accomplishmints;
+    var noteContent = '';
+     for (var item in accomplishmints) {
+      if(accomplishmints[item].id === id) {
+        noteContent = accomplishmints[item].notes;
+      }
+     }
+    return '<div class="item__notes" data-id="' + id + '"><small>Add some notes about what you did:</small><br> <textarea class="item__notes__input" cols="40" rows="5">'+noteContent+'</textarea></div>';
   },
   generateItemAdvancedMenuHTML: function(id, open) {
     var openClass = '';
@@ -334,7 +342,7 @@ mintView.prototype = {
       '" class="item__advanced'+ openClass +'">' +
       this.generateTagHTML(id) +
       this.generateItemStarsHTML(id) +
-      this.generateItemNotesHTML() +
+      this.generateItemNotesHTML(id) +
       "</div>"
     );
   },

@@ -43,6 +43,10 @@ mintController.prototype = {
       }
       return;
     }
+    if ($input === 'item__notes__input') {
+      this.updateNoteContent(args);
+      return;
+    }
     if ($input === "editable-accomplishmint") {
       if (key === 13 || key === 10) {
         event.preventDefault();
@@ -57,6 +61,12 @@ mintController.prototype = {
       }
       return;
     }
+  },
+  updateNoteContent:function(args) {
+    var event = args.event;
+    var id = $(event.target).closest('.item-container').attr('id');
+    var noteContent = event.target.value;
+    this.model.updateNoteContent(id, noteContent);
   },
   addNewTagToItem: function(args) {
     // Tell the model it needs to add a new tag to the item in its data
