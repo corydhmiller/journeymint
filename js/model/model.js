@@ -85,7 +85,7 @@ mintModel.prototype = {
       goal: "",
       tags: [],
       stars: 0,
-      notes: undefined
+      notes: ""
     };
     // Add this new accomplishmint to the Model data array
     this.accomplishmints.push(newAccomplishmint);
@@ -235,6 +235,16 @@ mintModel.prototype = {
       id: args.id,
       tagid: args.tagid
     });
+  },
+  updateNoteContent: function(id, noteContent){
+    id = parseInt(id);
+    noteContent = this.sanitizeText(noteContent);
+    for (var item in this.accomplishmints){
+      if(this.accomplishmints[item].id === id) {
+        this.accomplishmints[item].notes = noteContent;
+      }
+    }
+    this.putAccomplishmintsIntoStorage();
   },
   updateStarLevel: function(id, starValue) {
     starValue = parseInt(starValue);

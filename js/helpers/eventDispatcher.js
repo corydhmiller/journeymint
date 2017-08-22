@@ -4,7 +4,6 @@ var Event = function(sender) {
 };
 Event.prototype = {
   attach: function() {
-    window.console.log(arguments);
       for (var i in arguments) {
         this.listeners.push(arguments[i]); 
       }
