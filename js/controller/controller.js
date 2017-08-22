@@ -33,42 +33,42 @@ mintController.prototype = {
   },
   keyActionsController: function(sender, args) {
     var event = args.event;
-    var id = $(event.target).closest('.item-container').attr('id'); 
     var $input = event.target.className;
-    var content = event.target.value;
     var key = event.originalEvent.keyCode;
 
     if ($input === 'accomplishmint__input') {
       if (key === 13 || key === 10) {
         event.preventDefault();
-        this.addAccomplishmint(content);
+        this.addAccomplishmint(args);
       }
       return;
     }
     if ($input === "editable-accomplishmint") {
       if (key === 13 || key === 10) {
         event.preventDefault();
-        this.saveEditedAccomplishmint(sender, args);
+        this.saveEditedAccomplishmint(args);
       }
       return;
     }
     if ($input === 'item__tag__input') {
       if (key === 13 || key === 10) {
         event.preventDefault();
-        this.addNewTagToItem(id, content);
+        this.addNewTagToItem(args);
       }
       return;
     }
   },
-  addNewTagToItem: function(id, content) {
+  addNewTagToItem: function(args) {
     // Tell the model it needs to add a new tag to the item in its data
+    var id = $(event.target).closest('.item-container').attr('id'); 
+    var content = args.event.target.value;
     this.model.addNewTagToItem(id, content);
     $("#advanced-"+id).find("#item__tag__input").focus();
   },
   deleteItemTag: function(sender, args) {
     this.model.deleteItemTag(args);
   },
-  saveEditedAccomplishmint: function(sender, args) {
+  saveEditedAccomplishmint: function(args) {
     // Grab the id, do some stuff that maybe the controller shouldn't be doing,
     // and save it in the model.
     var event = args.event;
@@ -77,8 +77,8 @@ mintController.prototype = {
     $("#advanced-" + id).removeClass("item__advanced--open");
     this.model.saveEditedAccomplishmint(id, newcontent);
   },
-  addAccomplishmint: function(content) {
-    this.model.addAccomplishmint(content);
+  addAccomplishmint: function(args) {
+    this.model.addAccomplishmint(args.event.target.value);
   },
   deleteAccomplishmint: function(sender, args) {
     // Self explanatory
