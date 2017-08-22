@@ -48,30 +48,25 @@ mintView.prototype = {
     this.deleteItemTagClickHandler = this.deleteItemTagClick.bind(this);
     this.displayTagErrorHandler = this.displayTagError.bind(this);
     this.keyActionsHandler = this.keyActions.bind(this);
-    this.cacheDOMHandler = this.cacheDOM.bind(this);
     return this;
   },
 
   enable: function() {
     // Listeners
     this.model.retrieveAccomplishmintsFromStorageEvent.attach(this.buildListHandler);
-    this.model.addAccomplishmintEvent.subscribe([
-      this.displayNewEncouragementHandler,
+    this.model.addAccomplishmintEvent.attach(
       this.addAccomplishmintHandler,
-      this.updateTodaysScoreHandler,
-      this.cacheDOMHandler
-    ]);
-    this.model.deleteAccomplishmintEvent.subscribe([
+      this.displayNewEncouragementHandler,
+      this.updateTodaysScoreHandler
+    );
+    this.model.deleteAccomplishmintEvent.attach(
       this.removeAccomplishmintFromViewHandler,
-      this.updateTodaysScoreHandler,
-      this.cacheDOMHandler
-    ]);
-    this.model.saveEditedAccomplishmintEvent.subscribe([
+      this.updateTodaysScoreHandler
+    );
+    this.model.saveEditedAccomplishmintEvent.attach(
       this.rebuildItemCardHandler,
-      this.updateTodaysScoreHandler,
-      this.cacheDOMHandler
-    ]);
-    //this.model.updateTodaysScoreEvent.attach(this.updateTodaysScoreHandler);
+      this.updateTodaysScoreHandler
+    );
     this.model.addItemTagEvent.attach(this.addItemTagHandler);
     this.model.deleteItemTagEvent.attach(this.deleteItemTagHandler);
     this.model.displayTagErrorEvent.attach(this.displayTagErrorHandler);
@@ -88,9 +83,6 @@ mintView.prototype = {
     this.$accomplishmintsList.on("click", ".item__stars label", this.updateStarLevelHandler);
 
     return this;
-  },
-  cacheDOM:function() {
-    this.createChildren();
   },
   keyActions: function(event) {
     this.keyWasPressedEvent.notify({
@@ -220,7 +212,6 @@ mintView.prototype = {
     }
     this.clearAccomplishmintInput();
     this.updateTodaysScore();
-    this.cacheDOM();
   },
   assignRandomColorClass:function() {
     var randomColors = ['item__tag--green', 'item__tag--lightgreen', 'item__tag--darkgreen'];

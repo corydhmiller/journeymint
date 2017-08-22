@@ -3,13 +3,11 @@ var Event = function(sender) {
   this.listeners = [];
 };
 Event.prototype = {
-  attach: function(listener) {
-      this.listeners.push(listener);
-  },
-  subscribe: function(listener) {
-    for (var i in listener) {
-      this.listeners.push(listener[i]); 
-    }
+  attach: function() {
+    window.console.log(arguments);
+      for (var i in arguments) {
+        this.listeners.push(arguments[i]); 
+      }
   },
   notify: function(args) {
     for (var i = 0; i < this.listeners.length; i += 1) {
