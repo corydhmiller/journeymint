@@ -16,6 +16,8 @@ mintController.prototype = {
     this.deleteItemTagHandler = this.deleteItemTag.bind(this);
     this.updateStarLevelHandler = this.updateStarLevel.bind(this);
     this.keyActionsHandler = this.keyActionsController.bind(this);
+    this.checkboxToggleControllerHandler = this.checkboxToggleController.bind(this);
+    this.masterDeleteClickedHandler = this.masterDeleteController.bind(this);
     return this;
   },
   enable: function() {
@@ -26,10 +28,31 @@ mintController.prototype = {
     this.view.deleteItemTagClickEvent.attach(this.deleteItemTagHandler);
     this.view.updateStarLevelEvent.attach(this.updateStarLevelHandler);
     this.view.keyWasPressedEvent.attach(this.keyActionsHandler);
-
+    this.view.checkboxToggleEvent.attach(this.checkboxToggleControllerHandler);
+    this.view.masterDeleteClickedEvent.attach(this.masterDeleteClickedHandler);
     // On App Load, Do This
     this.startBuildingList();
     return this;
+  },
+  masterDeleteController: function() {
+    this.model.masterDelete();
+  },
+  checkboxToggleController: function(sender, args) {
+    var event = args.event;
+    var checked = event.target.checked;
+    if (checked) {
+      this.addItemToSelectionArray(event);
+      return;
+    }
+    this.removeItemFromSelectionArray(event);
+  },
+  addItemToSelectionArray: function(event) {
+    var id = $(event.target).closest('.item-container').attr('id');
+    this.model.addItemToSelectionArray(id);
+  },
+  removeItemFromSelectionArray: function(event) {
+    var id = $(event.target).closest('.item-container').attr('id');
+    this.model.removeItemFromSelectionArray(id);
   },
   keyActionsController: function(sender, args) {
     var event = args.event;
@@ -50,7 +73,7 @@ mintController.prototype = {
     if ($input === "editable-accomplishmint") {
       if (key === 13 || key === 10) {
         event.preventDefault();
-        this.saveEditedAccomplishmint(args);
+        this.saveEditedAccomplishmint(sender, args);
       }
       return;
     }
@@ -78,7 +101,7 @@ mintController.prototype = {
   deleteItemTag: function(sender, args) {
     this.model.deleteItemTag(args);
   },
-  saveEditedAccomplishmint: function(args) {
+  saveEditedAccomplishmint: function(sender, args) {
     // Grab the id, do some stuff that maybe the controller shouldn't be doing,
     // and save it in the model.
     var event = args.event;

@@ -6,6 +6,8 @@ var mintView = function(model) {
   this.deleteItemTagClickEvent = new Event(this);
   this.updateStarLevelEvent = new Event(this);
   this.keyWasPressedEvent = new Event(this);
+  this.checkboxToggleEvent = new Event(this);
+  this.masterDeleteClickedEvent = new Event(this);
 
   this.init();
 };
@@ -27,8 +29,10 @@ mintView.prototype = {
     this.$messageContainer = $(".message-container");
     this.$scoreTally = $(".app-score__tally");
     this.$advancedContainer = $(".item__advanced");
+    this.$masterDeleteButton = $(".master-delete");
     this.$itemContainer = this.$accomplishmintsList.find(".item-container");
     this.$itemTagInput = this.$accomplishmintsList.find(".item__tag__input");
+    this.$masterMenu = $('.master-menu');
 
     return this;
   },
@@ -48,6 +52,9 @@ mintView.prototype = {
     this.deleteItemTagClickHandler = this.deleteItemTagClick.bind(this);
     this.displayTagErrorHandler = this.displayTagError.bind(this);
     this.keyActionsHandler = this.keyActions.bind(this);
+    this.checkboxToggleActionsHandler = this.checkboxToggleActions.bind(this);
+    this.masterDeleteClickHandler = this.masterDeleteClick.bind(this);
+    this.toggleMasterMenuHandler = this.toggleMasterMenu.bind(this);
     return this;
   },
 
@@ -61,6 +68,7 @@ mintView.prototype = {
     );
     this.model.deleteAccomplishmintEvent.attach(
       this.removeAccomplishmintFromViewHandler,
+      this.toggleMasterMenuHandler,
       this.updateTodaysScoreHandler
     );
     this.model.saveEditedAccomplishmintEvent.attach(
@@ -70,9 +78,11 @@ mintView.prototype = {
     this.model.addItemTagEvent.attach(this.addItemTagHandler);
     this.model.deleteItemTagEvent.attach(this.deleteItemTagHandler);
     this.model.displayTagErrorEvent.attach(this.displayTagErrorHandler);
+    this.model.selectionCountUpdatedEvent.attach(this.toggleMasterMenuHandler);
 
     // Manage actions
     this.$input.keydown(this.keyActionsHandler);
+    this.$masterDeleteButton.click(this.masterDeleteClickHandler);
     this.$accomplishmintsList.on("keydown", ".editable-accomplishmint", this.keyActionsHandler);
     this.$accomplishmintsList.on("keydown", ".item__tag__input", this.keyActionsHandler);
     this.$accomplishmintsList.on("keyup", ".item__notes__input", this.keyActionsHandler);
@@ -82,8 +92,16 @@ mintView.prototype = {
     this.$accomplishmintsList.on("click", ".accomplishmint__item-content--editable", this.editAccomplishmintHandler);
     this.$accomplishmintsList.on("click", ".item__tag .item__close", this.deleteItemTagClickHandler);
     this.$accomplishmintsList.on("click", ".item__stars label", this.updateStarLevelHandler);
-
+    this.$accomplishmintsList.on("change", ".item__checkbox", this.checkboxToggleActionsHandler);
     return this;
+  },
+  masterDeleteClick: function() {
+    this.masterDeleteClickedEvent.notify();
+  },
+  checkboxToggleActions: function(event) {
+    this.checkboxToggleEvent.notify({
+      event: event
+    });
   },
   keyActions: function(event) {
     this.keyWasPressedEvent.notify({
@@ -116,6 +134,17 @@ mintView.prototype = {
     // Completely remove this item from the view.
     // Like, all the way remove.
     $("#" + args.id).remove();
+  },
+  toggleMasterMenu: function() {
+    window.console.log('checking master menu');
+    var selNum = this.model.selectedAccomplishmints;
+    if (selNum.length < 1) {
+      window.console.log('do nothing/hide');
+      this.$masterMenu.hide();
+      return;
+    }
+    window.console.log('show');
+    this.$masterMenu.show();
   },
   addClassForATime:function(event, toggle, time) {
     event.removeClass(toggle);
@@ -258,8 +287,7 @@ mintView.prototype = {
         // Also search through all the tags in the master tag object.
         if (mastertags[mastertag].tagid === tags[r]) {
           // If there's a match, create the tag HTML here
-          html =
-            html + this.generateSingleTagHTML(id, mastertags[mastertag].tagid, mastertags[mastertag].tagname);
+          html = html + this.generateSingleTagHTML(id, mastertags[mastertag].tagid, mastertags[mastertag].tagname);
         }
       }
     }
@@ -277,7 +305,7 @@ mintView.prototype = {
   generateItemCardHTML: function(id, content) {
     return (
       '<div data-id="' + id +
-      '" class="card accomplishmint-container"><div class="accomplishmint__item"><span data-id="' +
+      '" class="card accomplishmint-container"><div class="accomplishmint__item"><input type="checkbox" class="item__checkbox"><span data-id="' +
       id +
       '" class="accomplishmint__item-content accomplishmint__item-content--editable">' +
       content +
@@ -289,26 +317,23 @@ mintView.prototype = {
     );
   },
   generateItemStarsHTML: function(id) {
-    // This is MESSY. I hate it SO MUCH.
-    // It works, but I hate it.
     var html = '<div class="item__stars"><small>How did this accomplishmint make you feel?</small><br> <fieldset>';
     var accomplishmints = this.model.accomplishmints;
-     for (var item in accomplishmints) {
-       for (var i = 1; i <= 4; i++) {
-         var initialStarValue = 1;
-         if(accomplishmints[item].id === id) {
-           var starValue = accomplishmints[item].stars;
-        html = html + '<input type=\"radio\" id=\"'+ id +'-star'+i+'\" name=\"'+ id +'-star\" value=\"'+i+'\"';
-           if (starValue === i){
-             initialStarValue++;
-             html = html + "checked";
-           }
-        html = html + '><label for=\"'+ id +'-star'+i+'\">'+i+' stars</label>';
+      for (var item in accomplishmints) {
+        for (var i = 1; i <= 4; i++) {
+          var initialStarValue = 1;
+          if(accomplishmints[item].id === id) {
+            var starValue = accomplishmints[item].stars;
+            html = html + '<input type=\"radio\" id=\"'+ id +'-star'+i+'\" name=\"'+ id +'-star\" value=\"'+i+'\"';
+            if (starValue === i) {
+              initialStarValue++;
+              html = html + "checked";
+            }
+            html = html + '><label for=\"'+ id +'-star'+i+'\">'+i+' stars</label>';
+          }
         }
       }
-    }
     html = html + '</fieldset></div>';
-    // I hate it. So much.
     return html;
   },
   
@@ -327,6 +352,7 @@ mintView.prototype = {
      for (var item in accomplishmints) {
       if(accomplishmints[item].id === id) {
         noteContent = accomplishmints[item].notes;
+        break;
       }
      }
     return '<div class="item__notes" data-id="' + id + '"><small>Add some notes about what you did:</small><br> <textarea class="item__notes__input" cols="40" rows="5">'+noteContent+'</textarea></div>';

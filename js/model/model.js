@@ -2,6 +2,7 @@
 var mintModel = function() {
   // Set up variables
   this.accomplishmints = [];
+  this.selectedAccomplishmints = [];
   // These are dummy tags. Every global tag will be stored here in these tags. In the future, this list will be stored and retrieve just like the accomplishmints
   this.tags = [];
   this.datesInArchive = [];
@@ -33,8 +34,8 @@ var mintModel = function() {
   this.updateItemTagsEvent = new Event(this);
   this.addItemTagEvent = new Event(this);
   this.deleteItemTagEvent = new Event(this);
-  //this.updateTodaysScoreEvent = new Event(this);
   this.displayTagErrorEvent = new Event(this);
+  this.selectionCountUpdatedEvent = new Event(this);
 
   // Set up the database
   this.database = new Database();
@@ -92,7 +93,6 @@ mintModel.prototype = {
     // Run the function that submits the Model's data into the database/storage
     this.putAccomplishmintsIntoStorage();
     this.addAccomplishmintEvent.notify(newAccomplishmint);
-    //this.updateTodaysScoreEvent.notify();
   },
   saveEditedAccomplishmint: function(id, newcontent) {
     id = parseInt(id);
@@ -102,6 +102,7 @@ mintModel.prototype = {
       if (accomplishmints[item].id === id) {
         accomplishmints[item].content = newcontent;
         accomplishmints[item].score = this.getAccomplishmintScore(newcontent);
+        break;
       }
     }
     // Run the function that submits the Model's data into the database/storage
@@ -110,24 +111,36 @@ mintModel.prototype = {
       id: id,
       newcontent: newcontent
     });
-    //this.updateTodaysScoreEvent.notify();
   },
-  deleteAccomplishmint: function(id) {
-    // This function handles the deletion of
-    var accomplishmints = this.accomplishmints.sort();
-    // Convert ID from string into integer
-    id = parseInt(id);
-    // Search the array for the matching ID. When it is found, remove it from the array
-    for (var i = accomplishmints.length - 1; i >= 0; i--) {
-      if (accomplishmints[i].id === id) {
-        accomplishmints.splice(i, 1);
+  deleteAccomplishmint: function() {
+    // This is a bit messy, but works.
+    // Run a loop on incoming arguments. Could be a single id or set of ids.
+    for (var i in arguments) {
+      // Run a loop on existing items
+      for (var item in this.accomplishmints) {
+        // Make sure it's an integer, not a string
+        var id = parseInt(arguments[i]);
+        // If the accomplishmint id matches the incoming id...
+        if (this.accomplishmints[item].id === id){
+          /// ...kill it.
+          this.accomplishmints.splice(item, 1);
+          // Now that there's a match, run a quick loop inside the selection array.
+          for (var sel in this.selectedAccomplishmints) {
+            // If there's a match, remove it from the array.
+            if (this.selectedAccomplishmints[sel] === id){
+              this.selectedAccomplishmints.splice(sel, 1);
+            }
+          }
+          // let the world know the items have been deleted.
+          this.deleteAccomplishmintEvent.notify({
+            id: id
+          });
+          break;
+        }
       }
     }
+    // put the accomplishmints into storage
     this.putAccomplishmintsIntoStorage();
-    //this.updateTodaysScoreEvent.notify();
-    this.deleteAccomplishmintEvent.notify({
-      id: id
-    });
   },
   checkThroughArrayForNumber: function(value, array) {
     // This function takes a value and looks through an array to see if the array contains that value
@@ -204,6 +217,7 @@ mintModel.prototype = {
       if (accomplishmints[j].id === id) {
         // When we find the matching item, push the newTagID into the tags
         accomplishmints[j].tags.push(newTagID);
+        break;
       }
     }
     // Now save all the master tags to the database.
@@ -219,7 +233,6 @@ mintModel.prototype = {
       tagid: newTagID,
       tagname: tagname
     });
-    return;
   },
   deleteItemTag:function(args){
     for (var item in this.accomplishmints) {
@@ -242,6 +255,7 @@ mintModel.prototype = {
     for (var item in this.accomplishmints){
       if(this.accomplishmints[item].id === id) {
         this.accomplishmints[item].notes = noteContent;
+        break;
       }
     }
     this.putAccomplishmintsIntoStorage();
@@ -252,6 +266,7 @@ mintModel.prototype = {
     for (var item in this.accomplishmints){
       if(this.accomplishmints[item].id === id) {
         this.accomplishmints[item].stars = starValue;
+        break;
       }
     }
     this.putAccomplishmintsIntoStorage();
@@ -308,5 +323,29 @@ mintModel.prototype = {
       this.tags = storedTags;
     }
     return;
+  },
+  addItemToSelectionArray: function(id) {
+    id = parseInt(id);
+    this.selectedAccomplishmints.push(id);
+    this.selectionCountUpdatedEvent.notify();
+  },
+  removeItemFromSelectionArray: function(id) {
+    id = parseInt(id);
+    for (var item in this.selectedAccomplishmints) {
+      if (this.selectedAccomplishmints[item] === id) {
+        this.selectedAccomplishmints.splice(item, 1);
+        break;
+      }
+    }
+    this.selectionCountUpdatedEvent.notify();
+  },
+  masterDelete: function() {
+    var killItems = this.selectedAccomplishmints;
+    if (killItems.length < 1) {
+      return;
+    }
+    this.deleteAccomplishmint.apply(this, killItems);
+    this.selectedAccomplishmints = [];
+    this.selectionCountUpdatedEvent.notify();
   }
 };
