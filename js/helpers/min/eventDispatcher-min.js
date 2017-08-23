@@ -1,1 +1,0 @@
-var Event=function(t){this.sender=t,this.listeners=[]};Event.prototype={attach:function(){for(var t in arguments)this.listeners.push(arguments[t])},notify:function(t){for(var n=0;n<this.listeners.length;n+=1)this.listeners[n](this.sender,t)}};

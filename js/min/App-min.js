@@ -1,1 +1,0 @@
-$(function(){var n=new mintModel,e=new mintView(n),i=new mintController(n,e)});

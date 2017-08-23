@@ -1,7 +1,7 @@
 // Typography
 @import url('https://fonts.googleapis.com/css?family=Fira+Sans|Palanquin+Dark:500');
 $font: 'Fira Sans', sans-serif;
-$header: 'Palanquin Dark';
+$header: 'Palanquin Dark', sans-serif;
 
 // Color Scheme
 $white: #fafafa;
@@ -17,13 +17,27 @@ $darkaccent: darken($accent, 44%);
 $blue: #4F86C6;
 $red: #B21229;
 $shadow: 1px 1px 2px 0 $darkgrey;
+$gradient1: lighten($primary, 30%);
+$gradient2: lighten($primary, 35%);
+$gradient3: lighten($accent, 30%);
+$gradient4: lighten($accent, 35%);
 
+html {
+background-color: $gradient2;
+background-image: -webkit-linear-gradient(45deg, $gradient1 0%, $gradient2 100%);
+background-image: -moz-linear-gradient(45deg, $gradient1 0%, $gradient2 100%);
+background-image: -o-linear-gradient(45deg, $gradient1 0%, $gradient2 100%);
+background-image: linear-gradient(45deg, $gradient1 0%, $gradient2 100%);
+
+}
 body, html {
   margin: 0;
   padding: 0;
+  position:absolute;
+  top:0;
+  height:100%;
   width: 100%;
   font-size: 1em;
-  background: $lightgrey;
   color: $dark;
   font-family: $font;
   text-align:center;
@@ -76,7 +90,6 @@ h1 {
   font-weight: 500;
 }
 .app-container {
-  min-height:100vh;
   width: 100%;
   max-width: 468px;
   margin: 100px auto 0;
@@ -336,4 +349,18 @@ h1 {
 .item__tag--darkgreen {
   background:darken($primary, 5%);
   color:$white;
+}
+
+.master-menu {
+  display:none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 250px;
+    padding: 20px;
+    background: #fefefe;
+    box-shadow: 0px 0px 7px 2px rgba(0,0,0,.1);
+}
+.master__tag-input {
+  border-bottom: 1px solid $primary;
 }

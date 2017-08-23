@@ -6,16 +6,17 @@ This is a simple project I'm using to learn and test out new ways of doing thing
 
 
 ### Notes:
-Nothing recent.
+- Added the selection and deletion of multiple items.
+     - No way yet to select/deselect all. Soon.
 
 ### Roadmap:
 - ✅ Update event dispatcher to work with multiple arguments
 - ✅ Get tags working
 - ✅ Get notes working
-- Selection of multiple items
+- ✅ Selection of multiple items
 - Revamped scoring
 - Currency (what?)
 - Archive so users can view what they've put in previous days
  
 ### Current Bugs:
-- iOS has some entry/tapping bugs.
+- Global tagging does not yet work.
