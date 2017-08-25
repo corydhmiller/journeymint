@@ -35,7 +35,7 @@ body, html {
   padding: 0;
   position:absolute;
   top:0;
-  height:100%;
+  height:auto;
   width: 100%;
   font-size: 1em;
   color: $dark;
@@ -43,9 +43,7 @@ body, html {
   text-align:center;
   -webkit-font-smoothing: antialiased;
 }
-* {
-  
-}
+
 input,button {
   border:0;
     transition:.2s;
@@ -93,6 +91,7 @@ h1 {
   width: 100%;
   max-width: 468px;
   margin: 100px auto 0;
+  padding-bottom:75px;
 }
 .app-body {
   text-align: center;
@@ -161,15 +160,19 @@ h1 {
   display:flex;
   justify-content:flex-end;
 }
-.accomplishmint__button {
+.button {
   cursor:pointer;
   padding:5px;
   margin:0 5px;
   border-radius:.2em;
   font-weight:500;
 }
-.accomplishmint__button:hover {
+.button:hover {
   opacity:.8;
+}
+.button--red {
+  color:lighten($red, 60%);
+  background:$red;
 }
 .accomplishmint-edit {
 }
@@ -353,14 +356,20 @@ h1 {
 
 .master-menu {
   display:none;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 250px;
-    padding: 20px;
-    background: #fefefe;
-    box-shadow: 0px 0px 7px 2px rgba(0,0,0,.1);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index:99;
+  padding: 20px;
+  background: #fefefe;
+  box-shadow: 0px 0px 7px 2px rgba(0,0,0,.1);
 }
 .master__tag-input {
   border-bottom: 1px solid $primary;
+}
+.master-delete {
+  font-size: 1em;
+  padding: 10px;
+  font-weight: 600;
 }
