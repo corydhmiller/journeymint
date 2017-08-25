@@ -136,15 +136,12 @@ mintView.prototype = {
     $("#" + args.id).remove();
   },
   toggleMasterMenu: function() {
-    window.console.log('checking master menu');
     var selNum = this.model.selectedAccomplishmints;
     if (selNum.length < 1) {
-      window.console.log('do nothing/hide');
-      this.$masterMenu.hide();
+      this.$masterMenu.slideUp();
       return;
     }
-    window.console.log('show');
-    this.$masterMenu.show();
+    this.$masterMenu.slideDown();
   },
   addClassForATime:function(event, toggle, time) {
     event.removeClass(toggle);
@@ -230,7 +227,7 @@ mintView.prototype = {
     // Get the data from the model and set some variables
     var accomplishmints = this.model.getAccomplishmints();
     // Clear the HTML in the view
-    this.$accomplishmintsList.html("");   
+    this.$accomplishmintsList.html("");
     // Now let's add the items in each section
     for (var item in accomplishmints) {
       this.$accomplishmintsList.prepend(
@@ -311,9 +308,9 @@ mintView.prototype = {
       content +
       '</span></div><div class="accomplishmint-menu"><button data-id="' +
       id +
-      '" class="accomplishmint-edit accomplishmint__button">Edit</button><button data-id="' +
+      '" class="accomplishmint-edit button">Edit</button><button data-id="' +
       id +
-      '" class="accomplishmint-delete accomplishmint__button">X</button></div></div>'
+      '" class="accomplishmint-delete button">X</button></div></div>'
     );
   },
   generateItemStarsHTML: function(id) {
@@ -336,7 +333,7 @@ mintView.prototype = {
     html = html + '</fieldset></div>';
     return html;
   },
-  
+
   updateStarLevel: function(event) {
     var star = event.target.htmlFor;
     var id = $(event.target).parents(".item-container").attr("id");
