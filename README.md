@@ -2,7 +2,7 @@
 
 A simple app meant to help you feel good about your accomplishments, especially the small ones.
 
-This is a simple project I'm using to learn and test out new ways of doing things. This project uses currently uses Javascript and JQuery.
+This is a simple project I'm using to learn and test out new ways of doing things. This project uses currently uses JavaScript and JQuery.
 
 
 ### Notes:
